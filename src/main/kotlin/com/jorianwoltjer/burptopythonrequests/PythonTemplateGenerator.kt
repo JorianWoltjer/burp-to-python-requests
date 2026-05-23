@@ -7,8 +7,8 @@ import kotlin.collections.contains
 class PythonTemplateGenerator() {
     companion object {
         private val AUTH_HEADERS = arrayOf(
-            "Authorization",
-            "Cookie"
+            "authorization",
+            "cookie"
         )
 
         fun generate(requestResponse: HttpRequestResponse): String {
@@ -20,7 +20,7 @@ class PythonTemplateGenerator() {
             code.append(request.url().split('/').take(3).joinToString("/"))
             code.append("\"\n\n")
             code.append("s = requests.Session()\n")
-            val headers = request.headers().filter { !IGNORED_HEADERS.contains(it.name()) || AUTH_HEADERS.contains(it.name()) }
+            val headers = request.headers().filter { !IGNORED_HEADERS.contains(it.name().lowercase()) || AUTH_HEADERS.contains(it.name().lowercase()) }
             if (headers.isNotEmpty()) {
                 code.append("s.headers.update({\n")
                 headers.forEachIndexed { index, header ->

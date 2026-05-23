@@ -13,33 +13,33 @@ import com.fasterxml.jackson.databind.ObjectMapper
 class PythonRequestsConverter {
     companion object {
         val IGNORED_HEADERS = arrayOf(
-            "Host",
-            "Content-Length",
-            "User-Agent",
-            "Accept",
-            "Accept-Encoding",
-            "Connection",
-            "Upgrade-Insecure-Requests",
-            "Content-Type",
-            "Accept-Language",
-            "Referer",
-            "Cookie",
-            "Sec-Ch-Ua",
-            "Sec-Ch-Ua-Mobile",
-            "Sec-Ch-Ua-Platform",
-            "Sec-Fetch-Dest",
-            "Sec-Fetch-Mode",
-            "Sec-Fetch-Site",
-            "Sec-Fetch-User",
-            "Sec-Fetch-Storage-Access",
-            "Priority",
-            "If-Modified-Since",
-            "If-None-Match",
-            "Cache-Control",
-            "Authorization",
-            "Cookie",
-            "Origin",
-            "Pragma"
+            "host",
+            "content-length",
+            "user-agent",
+            "accept",
+            "accept-encoding",
+            "connection",
+            "upgrade-insecure-requests",
+            "content-type",
+            "accept-language",
+            "referer",
+            "cookie",
+            "sec-ch-ua",
+            "sec-ch-ua-mobile",
+            "sec-ch-ua-platform",
+            "sec-fetch-dest",
+            "sec-fetch-mode",
+            "sec-fetch-site",
+            "sec-fetch-user",
+            "sec-fetch-storage-access",
+            "priority",
+            "if-modified-since",
+            "if-none-match",
+            "cache-control",
+            "authorization",
+            "cookie",
+            "origin",
+            "pragma"
         )
 
         private fun escape(input: String): String {
@@ -108,7 +108,7 @@ class PythonRequestsConverter {
                 code.append("\n    ")
             }
 
-            val headers = request.headers().filter { !IGNORED_HEADERS.contains(it.name()) }
+            val headers = request.headers().filter { !IGNORED_HEADERS.contains(it.name().lowercase()) }
             if (headers.isNotEmpty()) {
                 code.append("headers = {\n    ")
                 headers.forEachIndexed { index, header ->
@@ -155,14 +155,12 @@ class PythonRequestsConverter {
             }
 
             code.append(")\n    ")
-            code.append("if r.ok:\n    ")
+            code.append("assert r.ok, f\"{r.status_code}: {r.text}\"\n\n    ")
             if (response != null && response.mimeType().equals(MimeType.JSON)) {
-                code.append("    return r.json()\n    ")
+                code.append("return r.json()\n")
             } else {
-                code.append("    return r.text\n    ")
+                code.append("return r.text\n")
             }
-            code.append("else:\n    ")
-            code.append("    raise Exception(f\"Request failed with status code {r.status_code}: {r.text}\")\n")
 
             return code.toString()
         }

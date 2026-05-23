@@ -12,15 +12,26 @@ repositories {
 }
 
 dependencies {
-    implementation("net.portswigger.burp.extensions:montoya-api:2025.5")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.19.0")
+  compileOnly("net.portswigger.burp.extensions:montoya-api:2025.5")
+  implementation("com.fasterxml.jackson.core:jackson-databind:2.19.0")
 }
 
 tasks.test {
-    useJUnitPlatform()
+  useJUnitPlatform()
 }
+
+tasks.jar {
+  enabled = false
+}
+
 tasks.shadowJar {
-    archiveFileName.set("to-python-requests.jar")
+  archiveClassifier.set("")
+  archiveFileName.set("to-python-requests.jar")
+  mergeServiceFiles()
+}
+
+tasks.build {
+  dependsOn(tasks.shadowJar)
 }
 kotlin {
     jvmToolchain(22)
